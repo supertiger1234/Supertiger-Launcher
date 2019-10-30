@@ -21,8 +21,11 @@ let mainWindow;
 let manageWindow;
 let optionsWindow;
 let screenSize;
+let scWidth = 1;
+let scHeight = 1;
 let tray = null;
-
+let width;
+let height;
 
 let SupertigerAutoLauncher = new AutoLaunch({
   name: 'Supertiger Launcher'
@@ -38,8 +41,8 @@ function createWindow() {
   screenSize = electron.screen.getAllDisplays()[0].size;
   if (store.get().games === undefined || store.get().games == "") {
     setupWindow = new BrowserWindow({
-      width: 800,
-      height: 600,
+      width: 800 * scWidth,
+      height: 600 * scHeight,
       frame: false,
       transparent: true,
       resizable: false
@@ -53,10 +56,9 @@ function createWindow() {
 
 ipcMain.on('close-file-browser', (evt, arg) => {
   fileManagerWindow.close();
-
   logoPickerWindow = new BrowserWindow({
-    width: 600,
-    height: 400,
+    width: 600 * scWidth,
+    height: 400 * scHeight,
     frame: false,
     transparent: true,
     resizable: false
@@ -81,10 +83,9 @@ ipcMain.on('close-me-setup', () => {
 
 
 ipcMain.on('open-icon-picker', (event, gameID) => {
-
   logoPickerWindow = new BrowserWindow({
-    width: 600,
-    height: 400,
+    width: 600 * scWidth,
+    height: 400 * scHeight,
     frame: false,
     transparent: true,
     resizable: false
@@ -134,9 +135,10 @@ ipcMain.on('close-logo-picker', (evt, filePath, logoPath, nickname, gameID) => {
 })
 
 ipcMain.on('open-file-browser-manage', () => {
+
   fileManagerWindow = new BrowserWindow({
-    width: 600,
-    height: 400,
+    width: 600 * scWidth,
+    height: 400 * scHeight,
     frame: false,
     transparent: true,
     resizable: false
@@ -146,9 +148,11 @@ ipcMain.on('open-file-browser-manage', () => {
 })
 
 ipcMain.on('open-file-browser', (evt, arg) => {
+
+
   fileManagerWindow = new BrowserWindow({
-    width: 600,
-    height: 400,
+    width: 600 * scWidth,
+    height: 400 * scHeight,
     frame: false,
     transparent: true,
     resizable: false
@@ -158,16 +162,18 @@ ipcMain.on('open-file-browser', (evt, arg) => {
 })
 
 ipcMain.on("expand-main-window", () => {
+  let num = 830 * scHeight
   mainWindow.setSize(mainWindow.getSize()[0], 830)
-
+  console.log(mainWindow.getSize()[0])
 })
 
 ipcMain.on("shrink-main-window", () => {
+  let num = 70*scHeight
   mainWindow.setBounds({
     x: mainWindow.getPosition()[0],
     y: mainWindow.getPosition()[1],
     width: mainWindow.getSize()[0],
-    height: 170
+    height: Math.floor(170 * scHeight+num)
   })
 })
 
@@ -208,9 +214,12 @@ ipcMain.on('reload-theme', () => {
 })
 
 function loadMainApp() {
+
+  let num = 900 * scWidth
+  let num2 = Math.floor(170 * scHeight)
   mainWindow = new BrowserWindow({
-    width: screenSize.width - 980,
-    height: 170,
+    width: screenSize.width - num,
+    height: num2,
     frame: false,
     transparent: true,
     resizable: false
@@ -218,7 +227,7 @@ function loadMainApp() {
 
   mainWindow.setSkipTaskbar(true)
 
-  let centerWindow = (screenSize.width - 980) / 2;
+  let centerWindow = (screenSize.width - num) / 2;
   let centerScreen = screenSize.width / 2;
 
   mainWindow.setPosition(centerScreen - centerWindow, 0)
@@ -251,9 +260,10 @@ function loadMainApp() {
 
 
 function optionsWindowLoad() {
+
   optionsWindow = new BrowserWindow({
-    width: 600,
-    height: 700,
+    width: 600 * scWidth,
+    height: 700 * scHeight,
     frame: false,
     transparent: true,
     resizable: false
@@ -264,9 +274,10 @@ function optionsWindowLoad() {
 }
 
 function manageWindowLoad() {
+
   manageWindow = new BrowserWindow({
-    width: 600,
-    height: 800,
+    width: 600 * scWidth,
+    height: 800 * scHeight,
     frame: false,
     transparent: true,
     resizable: false
@@ -276,4 +287,12 @@ function manageWindowLoad() {
 
 }
 
-app.on('ready', createWindow)
+app.on('ready', () => {
+  createWindow();
+  screenSize = electron.screen.getAllDisplays()[0].size;
+  width = screenSize.width;
+  height = screenSize.height
+  scWidth = width / 1920;
+  scHeight = height / 1080;
+  console.log(scHeight)
+});
